@@ -1,65 +1,114 @@
-import Image from "next/image";
+'use client';
+
+import { Github, MessageSquare, Shield, Zap, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+    <div className="flex min-h-screen flex-col bg-white text-gray-900">
+      {/* Navigation */}
+      <header className="sticky top-0 z-10 border-b border-gray-100 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white">
+              <MessageSquare size={18} />
+            </span>
+            WebAssist
+          </div>
+          <Link
+            href="https://github.com/RW2023/webassist"
             target="_blank"
-            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Github size={18} />
+            <span className="hidden sm:inline">View on GitHub</span>
+          </Link>
         </div>
+      </header>
+
+      {/* Hero Section */}
+      <main className="flex-1">
+        <section className="relative overflow-hidden pt-16 pb-24 lg:pt-32">
+          <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+            <h1 className="group mx-auto max-w-4xl text-5xl font-extrabold tracking-tight text-gray-900 sm:text-6xl mb-6">
+              Turn your content into an <br className="hidden sm:block" />
+              <span className="relative inline-block text-blue-600">
+                interactive assistant
+                <svg className="absolute -bottom-2 left-0 w-full h-3 text-blue-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+                </svg>
+              </span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
+              WebAssist is a lightweight, FAQ-first chatbot for Next.js. It grounds answers in your MDX content, falls back to an intake form when unsure, and respects your design system.
+            </p>
+
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link
+                href="https://github.com/RW2023/webassist"
+                target="_blank"
+                className="flex items-center gap-2 rounded-full bg-black px-8 py-3 text-base font-medium text-white shadow-lg shadow-black/20 transition-all hover:-translate-y-1 hover:bg-gray-800 hover:shadow-xl"
+              >
+                <Github size={20} />
+                Star on GitHub
+              </Link>
+              <button
+                onClick={() => document.querySelector('[aria-label="Toggle chat"]')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))}
+                className="flex items-center gap-2 rounded-full px-8 py-3 text-base font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                Try the Demo <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Grid */}
+        <section className="bg-gray-50 py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-12 lg:grid-cols-3">
+              {/* Feature 1 */}
+              <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200/50 transition-shadow hover:shadow-md">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+                  <Zap size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">Instant Answers</h3>
+                <p className="mt-2 text-gray-600">
+                  Uses your existing MDX/Markdown content as a knowledge base. No external vector DB required for simple use cases.
+                </p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200/50 transition-shadow hover:shadow-md">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-green-600">
+                  <Shield size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">No Hallucinations</h3>
+                <p className="mt-2 text-gray-600">
+                  Strictly grounded in your content. If the bot doesn't know, it admits it and offers a human fallback immediately.
+                </p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200/50 transition-shadow hover:shadow-md">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
+                  <MessageSquare size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">Smart Fallback</h3>
+                <p className="mt-2 text-gray-600">
+                  Seamlessly transitions from chat to a structured intake form when user needs complex help, delivering structured data to your team.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 bg-white py-12">
+        <div className="mx-auto max-w-7xl px-4 text-center text-gray-500 sm:px-6 lg:px-8">
+          <p>© {new Date().getFullYear()} WebAssist. Open source and ready to fork.</p>
+        </div>
+      </footer>
     </div>
   );
 }
