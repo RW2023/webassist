@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getFAQContent, findRelevantcontent } from '@/lib/chat/mdx-loader';
+import OpenAI from 'openai';
+
+// Initialize OpenAI Client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(req: Request) {
   try {
@@ -10,38 +16,50 @@ export async function POST(req: Request) {
     }
 
     // 1. Search Knowledge Base
-    // Note: In a real app, you'd cache getFAQContent() or use a vector DB.
-    // For this lightweight version, file system read is fine (Next.js caches in prod).
     const faqs = getFAQContent();
     const relevantContext = findRelevantcontent(message, faqs);
 
-    // 2. Generate Response (Mocked LLM Logic)
-    // If context found, answer based on it.
-    // If not, trigger fallback/intake suggestion.
-    
-    let responseText = "";
+    // 2. Prepare System Prompt
+    const systemPrompt = `
+You are a helpful and friendly AI assistant for WebAssist.
+Your goal is to answer user questions based ONLY on the provided context.
 
-    if (relevantContext) {
-      // Prompt construction logic would go here if calling an LLM API
-      // const prompt = `Context: ${relevantContext}\n\nQuestion: ${message}`;
-      
-      responseText = `Here is what I found:\n\n${relevantContext}\n\nDoes this help?`;
-    } else {
-      // Fallback
-      responseText = "I'm not sure about that. " + 
-        "Could you rephrase your question? Or would you like to speak to a human?";
-      
-      // Hint: The client could detect "speak to a human" to show a button, 
-      // or we can explicitly return a flag like { action: 'intake' }
+Context:
+${relevantContext || "No relevant context found."}
+
+Instructions:
+- If the answer is found in the context, answer clearly and concisely.
+- If the answer is NOT in the context, politely say "I'm not sure about that" and suggest they contact support.
+- Do NOT make up information (hallucinate).
+- Keep answers short (under 3 sentences) unless detailed explanation is needed.
+- If the context is empty, guide them to use the fallback form.
+    `;
+
+    // 3. Call OpenAI
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo", // Cost-effective and fast
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: message },
+      ],
+      temperature: 0.1, // Low temperature for factual consistency
+    });
+
+    const responseText = completion.choices[0].message.content || "I'm sorry, I couldn't generate a response.";
+
+    // Simple heuristic: If response mentions "contact support" or similar, suggest intake
+    // Or if context was not used.
+    let action = undefined;
+    if (!relevantContext || responseText.toLowerCase().includes('contact support')) {
+        action = 'intake';
     }
-
-    // Simulate delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
 
     return NextResponse.json({ 
       response: responseText,
-      contextUsed: !!relevantContext 
+      contextUsed: !!relevantContext,
+      action
     });
+
   } catch (error) {
     console.error('Chat API Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

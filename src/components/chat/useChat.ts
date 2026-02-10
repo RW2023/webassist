@@ -4,6 +4,7 @@ export type Message = {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
+  action?: 'intake';
 };
 
 export type ChatState = {
@@ -42,11 +43,12 @@ export function useChat() {
 
   const toggleChat = useCallback(() => setIsOpen((prev) => !prev), []);
 
-  const addMessage = useCallback((role: Message['role'], content: string) => {
+  const addMessage = useCallback((role: Message['role'], content: string, action?: Message['action']) => {
     const newMessage: Message = {
       id: crypto.randomUUID(),
       role,
       content,
+      action,
     };
     setMessages((prev) => [...prev, newMessage]);
     return newMessage;
@@ -77,7 +79,7 @@ export function useChat() {
       }
 
       const data = await response.json();
-      addMessage('assistant', data.response); // Assuming API returns { response: string }
+      addMessage('assistant', data.response, data.action); // Pass action if present
     } catch (error) {
       console.error('Failed to send message:', error);
       addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
