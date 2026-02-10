@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Send, X, Loader2, User, Bot, HelpCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import type { Message } from './useChat';
+import { IntakeForm } from './IntakeForm';
 
 interface ChatWindowProps {
     messages: Message[];
@@ -15,6 +16,7 @@ interface ChatWindowProps {
 
 export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: ChatWindowProps) {
     const [input, setInput] = useState('');
+    const [showIntake, setShowIntake] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll to bottom
@@ -30,6 +32,25 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
         onSendMessage(input);
         setInput('');
     };
+
+    const handleIntakeSuccess = () => {
+        setShowIntake(false);
+        onSendMessage("I've sent your message to support. We'll be in touch soon!");
+    };
+
+    if (showIntake) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="mb-4 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl sm:w-[400px]"
+            >
+                <IntakeForm onCancel={() => setShowIntake(false)} onSubmitSuccess={handleIntakeSuccess} />
+            </motion.div>
+        );
+    }
 
     return (
         <motion.div
@@ -47,7 +68,12 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
                     </div>
                     <div>
                         <h3 className="font-semibold text-sm">Assistant</h3>
-                        <p className="text-xs text-gray-500">Ask us anything</p>
+                        <button
+                            onClick={() => setShowIntake(true)}
+                            className="text-xs text-blue-600 hover:underline"
+                        >
+                            Contact Support
+                        </button>
                     </div>
                 </div>
                 <button
@@ -112,7 +138,7 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Type your question..."
-                        className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                        className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                         disabled={isLoading}
                     />
                     <button
