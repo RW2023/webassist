@@ -27,11 +27,11 @@ Instructions:
   inputPlaceholder: "Type your question...",
   fallbackButtonText: "Contact Dev",
   
-  // Intake Form
   intake: {
     title: "Contact Developer",
     subtitle: "Send a message directly to the developer.",
     successMessage: "Message sent! We'll get back to you soon.",
+    formspreeId: "xbdkelky",
   },
 
   // Social / Links (used in Landing Page)

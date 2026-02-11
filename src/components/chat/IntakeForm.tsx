@@ -23,13 +23,18 @@ export function IntakeForm({ onCancel, onSubmitSuccess }: IntakeFormProps) {
     const data = Object.fromEntries(formData.entries());
 
     try {
-      // Replace with your Formspree Endpoint or API Route
-      // For now, we simulate a successful submission
-      // const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', ...);
+      const response = await fetch(`https://formspree.io/f/${CHATBOT_CONFIG.intake.formspreeId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(data),
+      });
 
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating network
-
-      // if (!response.ok) throw new Error('Submission failed');
+      if (!response.ok) {
+        throw new Error('Submission failed');
+      }
 
       onSubmitSuccess();
     } catch (err) {
