@@ -103,7 +103,7 @@ export function ChatWindow({
                             <Key size={12} /> Bring Your Own Key (Optional)
                         </label>
                         <p className="text-xs text-gray-400">
-                            Provide your own OpenAI API key to use the chatbot. If left empty, the developer's key will be used.
+                            To use the chatbot, provide your own OpenAI API key OR enter the access password provided by the developer.
                         </p>
                         <form onSubmit={handleSaveSettings} className="space-y-4">
                             <div className="space-y-1.5">
