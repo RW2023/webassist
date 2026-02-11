@@ -31,7 +31,7 @@ Instructions:
     title: "Contact Developer",
     subtitle: "Send a message directly to the developer.",
     successMessage: "Message sent! We'll get back to you soon.",
-    formspreeId: "xbdkelky",
+    formspreeId: process.env.NEXT_PUBLIC_FORMSPREE_ID || "xbdkelky",
   },
 
   // Social / Links (used in Landing Page)
