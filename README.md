@@ -1,6 +1,9 @@
-# WebAssist
+# 🤖 WebAssist-Template
 
-Turn your content into an interactive assistant.
+**The ultimate Q&A Chatbot Template for Next.js applications.**
+
+> [!TIP]
+> **Use this Template:** Click the green **"Use this template"** button on GitHub to create a new repository based on this project.
 
 WebAssist is a lightweight, FAQ-first chatbot for Next.js applications. It grounds answers in your own MDX content (no hallucinations), provides a clean UI widget, and gracefully falls back to a structured intake form when it can't help.
 
