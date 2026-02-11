@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getFAQContent, findRelevantcontent } from '@/lib/chat/mdx-loader';
+import { getFAQContent, findRelevantContent } from '@/lib/chat/mdx-loader';
 import OpenAI from 'openai';
+import { CHATBOT_CONFIG } from '@/config/chatbot';
 
 // Initialize OpenAI Client
 const openai = new OpenAI({
@@ -17,22 +18,14 @@ export async function POST(req: Request) {
 
     // 1. Search Knowledge Base
     const faqs = getFAQContent();
-    const relevantContext = findRelevantcontent(message, faqs);
+    const relevantContext = findRelevantContent(message, faqs);
 
     // 2. Prepare System Prompt
     const systemPrompt = `
-You are a helpful and friendly AI assistant for WebAssist.
-Your goal is to answer user questions based ONLY on the provided context.
+${CHATBOT_CONFIG.systemPrompt}
 
 Context:
 ${relevantContext || "No relevant context found."}
-
-Instructions:
-- If the answer is found in the context, answer clearly and concisely.
-- If the answer is NOT in the context, politely say "I'm not sure about that" and suggest they contact support.
-- Do NOT make up information (hallucinate).
-- Keep answers short (under 3 sentences) unless detailed explanation is needed.
-- If the context is empty, guide them to use the fallback form.
     `;
 
     // 3. Call OpenAI

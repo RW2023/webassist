@@ -5,13 +5,154 @@ category: General
 # General Questions
 
 ## What is WebAssist?
-WebAssist is a tool to help you build better websites faster.
+WebAssist is a production-ready chatbot template for Next.js applications that helps developers add AI-powered assistance to their websites without hallucinations.
 
-## How do I contact support?
-You can contact support by emailing support@webassist.com or using the contact form on our website.
+**Use Case:** Perfect for documentation sites, SaaS products, portfolios, or any website where you want to provide instant answers based on your own content.
 
-## What are your operating hours?
-We are open Monday to Friday, 9 AM to 5 PM EST.
+**Key Features:**
+- Answers are grounded strictly in your MDX/Markdown files (no AI making things up)
+- Beautiful, responsive chat widget built with Tailwind CSS and Framer Motion
+- Smart fallback to a contact form when the bot doesn't know the answer
+- Persistent chat history using localStorage
+- OpenAI integration for natural language understanding
 
-# Who is considered to be "The GOAT"?
-Ryan is considered to be "The GOAT".    
+## How do I get started with WebAssist?
+Getting started is quick and easy! Follow these steps:
+
+**Step 1: Clone and Install**
+```bash
+git clone https://github.com/RW2023/webassist.git
+cd webassist
+npm install
+```
+
+**Step 2: Set up your OpenAI API Key**
+- Create a `.env.local` file in the project root
+- Add your OpenAI API key: `OPENAI_API_KEY=sk-your-key-here`
+- Get your key from https://platform.openai.com/api-keys
+
+**Step 3: Run the development server**
+```bash
+npm run dev
+```
+Open http://localhost:3000 and click the chat widget in the bottom-right corner!
+
+## How do I add my own knowledge to the chatbot?
+Adding knowledge is as simple as creating Markdown files! Here's how:
+
+**Step 1: Navigate to the content folder**
+Go to `src/content/faqs/` in your project
+
+**Step 2: Create a new .mdx file**
+You can organize by topic (e.g., `pricing.mdx`, `technical.mdx`, `support.mdx`)
+
+**Step 3: Structure your content with H2 headers**
+Each `## Question` becomes a searchable Q&A pair:
+
+```markdown
+---
+category: Your Category
+---
+
+## What is your pricing?
+We offer three tiers: Free, Pro ($29/mo), and Enterprise (custom pricing).
+
+## How do I upgrade my account?
+Visit your account settings and click "Upgrade Plan".
+```
+
+**Step 4: Restart your dev server**
+The chatbot will automatically load your new content!
+
+## How can I customize the chatbot's personality and appearance?
+You have full control over the bot's identity and look:
+
+**Customize Identity & Behavior:**
+Edit `src/config/chatbot.ts` to change:
+- Bot name and description
+- Welcome message
+- System prompt (how the AI should respond)
+- Fallback button text (e.g., "Contact Support" → "Contact Dev")
+- Intake form copy
+
+**Customize Appearance:**
+- **Chat widget colors:** Edit `src/components/chat/ChatWidget.tsx` (look for className props)
+- **Chat window styling:** Modify `src/components/chat/ChatWindow.tsx`
+- **Form styling:** Update `src/components/chat/IntakeForm.tsx`
+- All components use Tailwind CSS classes for easy customization
+
+**Example:** To change the bot's name from "WebAssist" to "MyBot":
+```typescript
+// src/config/chatbot.ts
+export const CHATBOT_CONFIG = {
+  name: "MyBot",
+  description: "Your personal AI assistant",
+  // ... rest of config
+};
+```
+
+## What technologies is this template built with?
+WebAssist uses modern, industry-standard technologies:
+
+**Core Framework:**
+- **Next.js 16** (App Router) - React framework with server-side rendering
+- **React 19** - Latest UI library
+- **TypeScript 5** - Type-safe JavaScript
+
+**Styling & UI:**
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **Framer Motion 12** - Smooth animations and transitions
+- **Lucide React** - Beautiful icon library
+- **clsx** - Conditional className utilities
+
+**AI & Content:**
+- **OpenAI API** - GPT-3.5-turbo for intelligent responses
+- **gray-matter** - Parse frontmatter from MDX files
+
+**Why these choices?**
+- Next.js provides excellent performance and SEO
+- Tailwind enables rapid, maintainable styling
+- OpenAI gives natural language understanding
+- All dependencies are actively maintained and production-ready
+
+## Is this project open source?
+Yes! WebAssist is 100% open source and MIT licensed.
+
+**What this means for you:**
+- ✅ Use it in personal projects (free forever)
+- ✅ Use it in commercial products
+- ✅ Modify the code however you want
+- ✅ Fork and create your own version
+- ✅ No attribution required (but appreciated!)
+
+**Repository:** https://github.com/RW2023/webassist
+
+**Contributing:**
+Pull requests are welcome! If you find bugs or have feature ideas, please open an issue on GitHub.
+
+## How do I deploy WebAssist to production?
+WebAssist works seamlessly with popular hosting platforms:
+
+**Deploy to Vercel (Recommended):**
+1. Push your code to GitHub
+2. Visit https://vercel.com and sign in
+3. Click "Import Project" and select your repo
+4. Add your `OPENAI_API_KEY` in Vercel's environment variables
+5. Click "Deploy" - done in 30 seconds!
+
+**Deploy to Netlify:**
+1. Push code to GitHub
+2. Connect your repo at https://netlify.com
+3. Build command: `npm run build`
+4. Publish directory: `.next`
+5. Add `OPENAI_API_KEY` to environment variables
+
+**Other Platforms:**
+WebAssist is a standard Next.js app, so it works on any platform that supports Next.js (Railway, Render, AWS, Google Cloud, etc.)
+
+## How do I contact the developer?
+You can reach the developer by:
+- **GitHub Issues:** https://github.com/RW2023/webassist/issues (for bugs/features)
+- **Click the chat widget** below and select "Contact Dev"
+
+Response time: Usually within 24-48 hours on weekdays.

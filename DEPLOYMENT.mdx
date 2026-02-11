@@ -1,0 +1,131 @@
+# Deploying the WebAssist Chatbot to Another Next.js Application
+
+## Overview
+
+The WebAssist chatbot is a self-contained, portable module that can be dropped into any Next.js 14+ project. It uses MDX files as a knowledge base, OpenAI for generating grounded responses, and includes a fallback intake/contact form.
+
+---
+
+## Step 1: Copy the Required Files
+
+Copy the following directories from this project into your target project's `src/` folder:
+
+```
+src/
+├── components/chat/
+│   ├── ChatWidget.tsx      # Floating chat button & toggle
+│   ├── ChatWindow.tsx      # Chat interface with messages & input
+│   ├── IntakeForm.tsx      # Fallback contact form
+│   └── useChat.ts          # Custom hook for chat state & API calls
+├── app/api/chat/
+│   └── route.ts            # POST endpoint for chat messages
+├── lib/chat/
+│   └── mdx-loader.ts       # Loads & searches MDX knowledge base
+├── config/
+│   └── chatbot.ts          # Bot identity, prompts, and UI text
+└── content/faqs/
+    ├── general.mdx          # Main FAQ content
+    └── bot-identity.mdx     # Bot personality (optional)
+```
+
+## Step 2: Install Dependencies
+
+Run the following in your target project:
+
+```bash
+npm install openai gray-matter framer-motion lucide-react clsx tailwind-merge
+```
+
+## Step 3: Set Your Environment Variable
+
+Create or update `.env.local` in the root of your target project:
+
+```env
+OPENAI_API_KEY=sk-your-key-here
+```
+
+## Step 4: Add the Chat Widget to Your Layout
+
+In your target app's `src/app/layout.tsx`, import and render the `ChatWidget` component:
+
+```tsx
+import { ChatWidget } from "@/components/chat/ChatWidget";
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <ChatWidget />
+      </body>
+    </html>
+  );
+}
+```
+
+## Step 5: Verify Prerequisites
+
+Make sure your target project has the following:
+
+- **TypeScript path alias**: `@/*` should map to `./src/*` in `tsconfig.json`
+- **Tailwind CSS**: Must be configured, as all chat components use Tailwind classes
+
+## Step 6: Customize for Your Site
+
+### Bot Configuration
+
+Edit `src/config/chatbot.ts` to update:
+
+- **name** — Your bot's display name
+- **description** — Short description of the bot
+- **welcomeMessage** — The first message users see
+- **systemPrompt** — Controls AI behavior and tone
+- **inputPlaceholder** — Placeholder text in the input field
+- **fallbackButtonText** — Label for the contact/intake button
+- **intake** — Title, subtitle, and success message for the contact form
+- **links** — GitHub, demo, or other relevant links
+
+### Knowledge Base
+
+Replace or add MDX files in `src/content/faqs/` with Q&A content relevant to your site. Each file should follow this format:
+
+```mdx
+---
+category: your-category
+---
+
+## Your Question Here?
+
+Your answer goes here. The bot uses these Q&A pairs to generate grounded responses.
+
+## Another Question?
+
+Another answer. Each H2 heading is treated as a question, and the text below it is the answer.
+```
+
+---
+
+## Architecture
+
+```
+User types message → useChat hook → POST /api/chat → MDX loader finds relevant FAQs
+    → OpenAI generates grounded response → displayed in ChatWindow
+```
+
+### Key Details
+
+- **No database required** — Knowledge lives entirely in MDX files
+- **Chat history** — Persists across page reloads via `localStorage`
+- **Fallback behavior** — If the bot cannot answer, it suggests the intake/contact form
+- **AI model** — Uses `gpt-3.5-turbo` with low temperature (0.1) for factual responses
+- **Content matching** — Simple keyword scoring algorithm (no vector database needed)
+
+### Data Flow
+
+1. User sends a message from the `ChatWindow`
+2. The `useChat` hook sends a POST request to `/api/chat`
+3. The API route loads all MDX files via `getFAQContent()`
+4. `findRelevantContent()` scores and returns the top 3 matching Q&A pairs
+5. OpenAI generates a response grounded in the matched content
+6. The response is returned and displayed in the chat window
+7. If no relevant content is found, the `intake` action triggers the contact form

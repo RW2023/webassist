@@ -10,7 +10,8 @@ WebAssist is a lightweight, FAQ-first chatbot for Next.js applications. It groun
 - **💬 Clean UI:** A modern, responsive chat widget and window built with Tailwind CSS and Framer Motion.
 - **📥 Smart Fallback:** Automatically suggests an intake form when confidence is low.
 - **💾 Persistent History:** Chats are saved to local storage so users don't lose context.
-- **🚀 Ready to Deploy:** Built on Next.js 14+ (App Router) and Vercel.
+- **🤖 Deployment Help:** The chatbot itself can guide you through deployment steps!
+- **🚀 Ready to Deploy:** Built on Next.js 14+ (App Router) and works with Vercel, Netlify, and more.
 
 ## Quick Start
 
@@ -25,12 +26,19 @@ WebAssist is a lightweight, FAQ-first chatbot for Next.js applications. It groun
     npm install
     ```
 
-3.  **Run the development server:**
+3.  **Set up your OpenAI API key:**
+    Create a `.env.local` file:
+    ```env
+    OPENAI_API_KEY=sk-your-key-here
+    ```
+    Get your key from [OpenAI Platform](https://platform.openai.com/api-keys).
+
+4.  **Run the development server:**
     ```bash
     npm run dev
     ```
 
-4.  **Open your browser:**
+5.  **Open your browser:**
     Navigate to [http://localhost:3000](http://localhost:3000). The chat widget will appear in the bottom-right corner.
 
 ## Usage
@@ -50,18 +58,49 @@ Go to the settings page and click "Reset Password".
 
 ### Configuration
 
+Edit `src/config/chatbot.ts` to customize:
+- **name** — Bot display name
+- **welcomeMessage** — First message users see
+- **systemPrompt** — AI behavior and tone
+- **fallbackButtonText** — Contact button label
+- **intake** — Contact form configuration
+
+### Customization
+
 The chatbot logic lives in `src/app/api/chat/route.ts`. You can customize:
-- **Matching Logic:** currently uses a simple keyword match (`mdx-loader.ts`).
-- **Confidence Threshold:** adjust when the bot switches to "fallback" mode.
-- **Intake Form Destination:** Update `src/components/chat/IntakeForm.tsx` to send data to your actual CRM or email service (e.g., Formspree).
+- **Matching Logic:** currently uses a simple keyword match (`mdx-loader.ts`)
+- **Confidence Threshold:** adjust when the bot switches to "fallback" mode
+- **Intake Form Destination:** Update `src/components/chat/IntakeForm.tsx` to send data to your CRM or email service (e.g., Formspree)
+
+## Deployment
+
+### Quick Deploy to Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Visit [vercel.com](https://vercel.com) and import your repo
+3. Add `OPENAI_API_KEY` to environment variables
+4. Deploy!
+
+### Deploy to Your Existing Next.js App
+
+Want to add this chatbot to an existing project? See the detailed integration guide in [DEPLOYMENT.mdx](./DEPLOYMENT.mdx) for step-by-step instructions.
+
+**Or just ask the chatbot!** Click the chat widget and ask:
+- "How do I deploy this?"
+- "Can I add this to my existing Next.js app?"
+- "What are the deployment prerequisites?"
+
+The bot has comprehensive deployment knowledge built-in and can guide you through the process.
 
 ## Tech Stack
 
-- **Framework:** [Next.js](https://nextjs.org/) (App Router)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Framework:** [Next.js](https://nextjs.org/) 16 (App Router)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) 4
 - **Animations:** [Framer Motion](https://www.framer.com/motion/)
 - **Icons:** [Lucide React](https://lucide.dev/)
+- **AI:** [OpenAI](https://openai.com/) GPT-3.5-turbo
 
 ## License
 
 MIT
+

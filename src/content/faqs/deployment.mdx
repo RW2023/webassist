@@ -1,0 +1,193 @@
+---
+category: Deployment
+---
+
+# Deployment
+
+## How do I deploy WebAssist to production?
+WebAssist works seamlessly with popular hosting platforms. Here are the most common deployment options:
+
+**Deploy to Vercel (Recommended):**
+1. Push your code to GitHub
+2. Visit https://vercel.com and sign in
+3. Click "Import Project" and select your repo
+4. Add your `OPENAI_API_KEY` in Vercel's environment variables
+5. Click "Deploy" - done in 30 seconds!
+
+**Deploy to Netlify:**
+1. Push code to GitHub
+2. Connect your repo at https://netlify.com
+3. Build command: `npm run build`
+4. Publish directory: `.next`
+5. Add `OPENAI_API_KEY` to environment variables
+
+**Other Platforms:**
+WebAssist is a standard Next.js app, so it works on any platform that supports Next.js (Railway, Render, AWS, Google Cloud, etc.)
+
+## Can I deploy this chatbot to my existing Next.js app?
+Yes! The WebAssist chatbot is a self-contained, portable module that can be dropped into any Next.js 14+ project.
+
+**Step 1: Copy the Required Files**
+
+Copy these directories from WebAssist into your project's `src/` folder:
+
+```
+src/
+├── components/chat/
+│   ├── ChatWidget.tsx      # Floating chat button & toggle
+│   ├── ChatWindow.tsx      # Chat interface with messages & input
+│   ├── IntakeForm.tsx      # Fallback contact form
+│   └── useChat.ts          # Custom hook for chat state & API calls
+├── app/api/chat/
+│   └── route.ts            # POST endpoint for chat messages
+├── lib/chat/
+│   └── mdx-loader.ts       # Loads & searches MDX knowledge base
+├── config/
+│   └── chatbot.ts          # Bot identity, prompts, and UI text
+└── content/faqs/
+    ├── general.mdx          # Main FAQ content
+    └── bot-identity.mdx     # Bot personality (optional)
+```
+
+**Step 2: Install Dependencies**
+
+```bash
+npm install openai gray-matter framer-motion lucide-react clsx tailwind-merge
+```
+
+**Step 3: Set Environment Variable**
+
+Create or update `.env.local`:
+
+```env
+OPENAI_API_KEY=sk-your-key-here
+```
+
+**Step 4: Add Widget to Layout**
+
+In `src/app/layout.tsx`:
+
+```tsx
+import { ChatWidget } from "@/components/chat/ChatWidget";
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <ChatWidget />
+      </body>
+    </html>
+  );
+}
+```
+
+**Step 5: Verify Prerequisites**
+
+- TypeScript path alias `@/*` maps to `./src/*` in `tsconfig.json`
+- Tailwind CSS must be configured (all components use Tailwind classes)
+
+**Step 6: Customize**
+
+Edit `src/config/chatbot.ts` to update bot name, welcome message, system prompt, and more.
+
+Replace or add MDX files in `src/content/faqs/` with your own Q&A content.
+
+## What are the deployment prerequisites?
+Before deploying, make sure you have:
+
+**Required:**
+- **Node.js 18+** installed
+- **OpenAI API key** from https://platform.openai.com/api-keys
+- **Git repository** (for Vercel/Netlify deployments)
+
+**For Your Target Project:**
+- **Next.js 14+** with App Router
+- **TypeScript** configured with `@/*` path alias
+- **Tailwind CSS** installed and configured
+
+## How does the chatbot architecture work?
+Understanding the architecture helps with deployment and customization:
+
+**Data Flow:**
+```
+User types message → useChat hook → POST /api/chat → MDX loader finds relevant FAQs
+    → OpenAI generates grounded response → displayed in ChatWindow
+```
+
+**Key Details:**
+- **No database required** — Knowledge lives entirely in MDX files
+- **Chat history** — Persists across page reloads via `localStorage`
+- **Fallback behavior** — If the bot cannot answer, it suggests the intake/contact form
+- **AI model** — Uses `gpt-3.5-turbo` with low temperature (0.1) for factual responses
+- **Content matching** — Simple keyword scoring algorithm (no vector database needed)
+
+**Step-by-Step Flow:**
+1. User sends a message from the `ChatWindow`
+2. The `useChat` hook sends a POST request to `/api/chat`
+3. The API route loads all MDX files via `getFAQContent()`
+4. `findRelevantContent()` scores and returns the top 3 matching Q&A pairs
+5. OpenAI generates a response grounded in the matched content
+6. The response is returned and displayed in the chat window
+7. If no relevant content is found, the `intake` action triggers the contact form
+
+## What environment variables do I need?
+Only one environment variable is required:
+
+```env
+OPENAI_API_KEY=sk-your-key-here
+```
+
+**Where to get your API key:**
+1. Visit https://platform.openai.com/api-keys
+2. Sign in or create an account
+3. Click "Create new secret key"
+4. Copy the key and add it to `.env.local` (local) or your hosting platform's environment variables (production)
+
+**Security Note:**
+- Never commit `.env.local` to version control
+- The API key should only be used server-side (it's safe in `/api/chat/route.ts`)
+
+## How much does deployment cost?
+**Hosting Costs:**
+- **Vercel/Netlify Free Tier:** $0/month for hobby projects
+- **Vercel Pro:** ~$20/month for production sites
+- **Other platforms:** Varies (many have free tiers)
+
+**OpenAI API Costs:**
+- **Model:** GPT-3.5-turbo
+- **Pricing:** ~$0.0015 per 1,000 tokens (very cheap!)
+- **Example:** 1,000 chatbot conversations ≈ $1-2
+
+**Total:** For most small to medium sites, expect **$0-5/month** total.
+
+## Can I use a different AI model?
+Yes! You can customize the AI model in `src/app/api/chat/route.ts`:
+
+**Current (default):**
+```typescript
+model: "gpt-3.5-turbo"  // Fast and cost-effective
+```
+
+**Options:**
+- `gpt-4` — More intelligent, higher cost
+- `gpt-4-turbo` — Balance of speed and intelligence
+- `gpt-3.5-turbo` — Fastest, cheapest (recommended)
+
+**To change:**
+Edit line 33 in `src/app/api/chat/route.ts` and replace the model name.
+
+## Do I need a vector database?
+No! WebAssist uses a simple keyword-based matching system that works great for most FAQ-style content.
+
+**When you DON'T need a vector database:**
+- FAQ-style content (most common)
+- Small to medium knowledge bases (< 100 documents)
+- Structured Q&A pairs
+
+**When you MIGHT want a vector database:**
+- Very large knowledge bases (1000+ documents)
+- Unstructured content (blog posts, long articles)
+- Need semantic similarity matching
+
+For most use cases, the built-in keyword matching is fast, free, and effective!
