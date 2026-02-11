@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, X, Loader2, User, Bot, HelpCircle } from 'lucide-react';
+import { Send, X, Loader2, User, Bot, HelpCircle, Settings, Key } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import type { Message } from './useChat';
@@ -13,12 +13,34 @@ interface ChatWindowProps {
     isLoading: boolean;
     onSendMessage: (content: string) => void;
     onClose: () => void;
+    userApiKey?: string;
+    setUserApiKey: (key: string | undefined) => void;
+    accessPassword?: string;
+    setAccessPassword: (password: string | undefined) => void;
 }
 
-export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: ChatWindowProps) {
+export function ChatWindow({
+    messages,
+    isLoading,
+    onSendMessage,
+    onClose,
+    userApiKey,
+    setUserApiKey,
+    accessPassword,
+    setAccessPassword
+}: ChatWindowProps) {
     const [input, setInput] = useState('');
     const [showIntake, setShowIntake] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [tempKey, setTempKey] = useState(userApiKey || '');
+    const [tempPassword, setTempPassword] = useState(accessPassword || '');
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    // Update temp states when props change
+    useEffect(() => {
+        setTempKey(userApiKey || '');
+        setTempPassword(accessPassword || '');
+    }, [userApiKey, accessPassword]);
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -32,6 +54,13 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
         if (!input.trim() || isLoading) return;
         onSendMessage(input);
         setInput('');
+    };
+
+    const handleSaveSettings = (e: React.FormEvent) => {
+        e.preventDefault();
+        setUserApiKey(tempKey.trim() || undefined);
+        setAccessPassword(tempPassword.trim() || undefined);
+        setShowSettings(false);
     };
 
     const handleIntakeSuccess = () => {
@@ -53,6 +82,80 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
         );
     }
 
+    if (showSettings) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="mb-4 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl sm:w-[400px]"
+            >
+                <div className="flex items-center justify-between border-b bg-gray-50 px-4 py-3">
+                    <h3 className="text-sm font-semibold">Settings</h3>
+                    <button onClick={() => setShowSettings(false)} className="rounded-full p-1 hover:bg-gray-200">
+                        <X size={18} />
+                    </button>
+                </div>
+                <div className="flex-1 p-6 space-y-4">
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                            <Key size={12} /> Bring Your Own Key (Optional)
+                        </label>
+                        <p className="text-xs text-gray-400">
+                            Provide your own OpenAI API key to use the chatbot. If left empty, the developer's key will be used.
+                        </p>
+                        <form onSubmit={handleSaveSettings} className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">OpenAI API Key</label>
+                                <input
+                                    type="password"
+                                    value={tempKey}
+                                    onChange={(e) => setTempKey(e.target.value)}
+                                    placeholder="sk-..."
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-black focus:outline-none"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">Access Password</label>
+                                <input
+                                    type="password"
+                                    value={tempPassword}
+                                    onChange={(e) => setTempPassword(e.target.value)}
+                                    placeholder="Enter access password"
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-black focus:outline-none"
+                                />
+                            </div>
+
+                            <div className="flex gap-2 pt-2">
+                                <button
+                                    type="submit"
+                                    className="flex-1 rounded-lg bg-black py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+                                >
+                                    Save Settings
+                                </button>
+                                {(userApiKey || accessPassword) && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setUserApiKey(undefined);
+                                            setAccessPassword(undefined);
+                                            setShowSettings(false);
+                                        }}
+                                        className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50"
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </motion.div>
+        );
+    }
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -68,7 +171,18 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
                         <Bot size={18} />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-sm">{CHATBOT_CONFIG.name}</h3>
+                        <div className="flex items-center gap-1.5">
+                            <h3 className="font-semibold text-sm">{CHATBOT_CONFIG.name}</h3>
+                            {(userApiKey || accessPassword) && (
+                                <div
+                                    className={clsx(
+                                        "h-1.5 w-1.5 rounded-full animate-pulse",
+                                        userApiKey ? "bg-green-500" : "bg-blue-500"
+                                    )}
+                                    title={userApiKey ? "Using your custom API key" : "Access password active"}
+                                />
+                            )}
+                        </div>
                         <button
                             onClick={() => setShowIntake(true)}
                             className="text-xs text-blue-600 hover:underline"
@@ -77,13 +191,22 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
                         </button>
                     </div>
                 </div>
-                <button
-                    onClick={onClose}
-                    className="rounded-full p-1 text-gray-500 hover:bg-gray-200"
-                    aria-label="Close"
-                >
-                    <X size={18} />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => setShowSettings(true)}
+                        className="rounded-full p-1.5 text-gray-500 hover:bg-gray-200"
+                        title="Settings"
+                    >
+                        <Settings size={18} />
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="rounded-full p-1.5 text-gray-500 hover:bg-gray-200"
+                        aria-label="Close"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
             </div>
 
             {/* Messages */}
@@ -146,7 +269,7 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder={CHATBOT_CONFIG.inputPlaceholder} // Use config placeholder
+                        placeholder={CHATBOT_CONFIG.inputPlaceholder}
                         className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                         disabled={isLoading}
                     />

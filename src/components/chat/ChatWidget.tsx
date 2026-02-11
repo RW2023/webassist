@@ -7,7 +7,17 @@ import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 
 export function ChatWidget() {
-    const { isOpen, toggleChat, messages, isLoading, sendMessage } = useChat();
+    const {
+        isOpen,
+        toggleChat,
+        messages,
+        isLoading,
+        sendMessage,
+        userApiKey,
+        setUserApiKey,
+        accessPassword,
+        setAccessPassword
+    } = useChat();
 
     return (
         <>
@@ -19,6 +29,10 @@ export function ChatWidget() {
                             isLoading={isLoading}
                             onSendMessage={sendMessage}
                             onClose={toggleChat}
+                            userApiKey={userApiKey}
+                            setUserApiKey={setUserApiKey}
+                            accessPassword={accessPassword}
+                            setAccessPassword={setAccessPassword}
                         />
                     )}
                 </AnimatePresence>

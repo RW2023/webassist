@@ -61,6 +61,22 @@ We are available Monday to Friday, 9am to 5pm EST.
 Go to the settings page and click "Reset Password".
 ```
 
+### Security & Gated Access
+
+WebAssist includes a premium security layer that balances developer costs with user flexibility.
+
+- **Bring Your Own Key (BYOK):** Users can enter their own OpenAI API key in the settings (gear icon). This key is stored securely in their browser's `localStorage` and sent via encrypted headers, completely bypassing your server's budget.
+- **Gated Access Password:** To prevent public abuse of your `OPENAI_API_KEY`, you can enable "Gated Access".
+  1. Add `ACCESS_PASSWORD=your_secure_password` to your `.env.local`.
+  2. Users must then enter this password in the chat settings to "unlock" the bot.
+  3. If neither a custom key nor the correct password is provided, the API returns a `401 Unauthorized` error.
+
+#### Visual Indicators
+The chat header features a color-coded pulse to show the active connection state:
+- 🟢 **Green Pulse:** Using a custom OpenAI API key (BYOK).
+- 🔵 **Blue Pulse:** Accessing the developer's key via Access Password.
+- ⚪ **No Pulse:** Unauthorized (setup required in settings).
+
 ### Configuration
 
 Edit `src/config/chatbot.ts` to customize:
@@ -70,12 +86,11 @@ Edit `src/config/chatbot.ts` to customize:
 - **fallbackButtonText** — Contact button label
 - **intake** — Contact form configuration
 
-### Customization
+### Advanced Logic
 
-The chatbot logic lives in `src/app/api/chat/route.ts`. You can customize:
-- **Matching Logic:** currently uses a simple keyword match (`mdx-loader.ts`)
-- **Confidence Threshold:** adjust when the bot switches to "fallback" mode
-- **Intake Form Destination:** Update `src/components/chat/IntakeForm.tsx` to send data to your CRM or email service (e.g., Formspree)
+- **Matching Logic:** Built-in keyword matching and context grounding in `src/lib/chat/mdx-loader.ts`.
+- **API Security:** Robust header-based authentication logic in `src/app/api/chat/route.ts`.
+- **State Persistence:** Automatic state synchronization with `localStorage` in `src/components/chat/useChat.ts`.
 
 ## Deployment
 

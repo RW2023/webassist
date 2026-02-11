@@ -11,6 +11,8 @@ export type ChatState = {
   messages: Message[];
   isOpen: boolean;
   isLoading: boolean;
+  userApiKey?: string;
+  accessPassword?: string;
 };
 
 const STORAGE_KEY = 'chat_storage_v1';
@@ -19,6 +21,8 @@ export function useChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [userApiKey, setUserApiKey] = useState<string | undefined>(undefined);
+  const [accessPassword, setAccessPassword] = useState<string | undefined>(undefined);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -28,6 +32,8 @@ export function useChat() {
         const parsed = JSON.parse(saved);
         setMessages(parsed.messages || []);
         setIsOpen(parsed.isOpen || false);
+        setUserApiKey(parsed.userApiKey || undefined);
+        setAccessPassword(parsed.accessPassword || undefined);
       } catch (e) {
         console.error('Failed to load chat history', e);
       }
@@ -38,8 +44,8 @@ export function useChat() {
   useEffect(() => {
     // Only save if we have messages or state changed
     // Debouncing could be added here if needed
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ messages, isOpen }));
-  }, [messages, isOpen]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ messages, isOpen, userApiKey, accessPassword }));
+  }, [messages, isOpen, userApiKey, accessPassword]);
 
   const toggleChat = useCallback(() => setIsOpen((prev) => !prev), []);
 
@@ -66,11 +72,21 @@ export function useChat() {
     setIsLoading(true);
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (userApiKey) {
+        headers['x-openai-api-key'] = userApiKey;
+      }
+
+      if (accessPassword) {
+        headers['x-access-password'] = accessPassword;
+      }
+
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ message: content }),
       });
 
@@ -86,7 +102,7 @@ export function useChat() {
     } finally {
       setIsLoading(false);
     }
-  }, [addMessage]);
+  }, [addMessage, userApiKey, accessPassword]);
 
   return {
     isOpen,
@@ -95,6 +111,10 @@ export function useChat() {
     isLoading,
     sendMessage,
     clearChat,
-    addMessage, // Exporting for flexibility
+    addMessage,
+    userApiKey,
+    setUserApiKey,
+    accessPassword,
+    setAccessPassword,
   };
 }

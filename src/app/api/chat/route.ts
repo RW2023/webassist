@@ -11,10 +11,29 @@ const openai = new OpenAI({
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
+    const customApiKey = req.headers.get('x-openai-api-key');
+    const accessPassword = req.headers.get('x-access-password');
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
+
+    // Gated Access Logic:
+    const serverAccessPassword = process.env.ACCESS_PASSWORD?.trim();
+    const normalizedAccessPassword = accessPassword?.trim();
+    const canUseServerKey = serverAccessPassword && normalizedAccessPassword === serverAccessPassword;
+
+    if (!customApiKey && !canUseServerKey) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Please provide an OpenAI API key or an access password in settings.' },
+        { status: 401 }
+      );
+    }
+
+    // Initialize OpenAI Client dynamically
+    const client = new OpenAI({
+      apiKey: customApiKey || process.env.OPENAI_API_KEY,
+    });
 
     // 1. Search Knowledge Base
     const faqs = getFAQContent();
@@ -29,7 +48,7 @@ ${relevantContext || "No relevant context found."}
     `;
 
     // 3. Call OpenAI
-    const completion = await openai.chat.completions.create({
+    const completion = await client.chat.completions.create({
       model: "gpt-3.5-turbo", // Cost-effective and fast
       messages: [
         { role: "system", content: systemPrompt },
