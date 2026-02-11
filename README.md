@@ -1,5 +1,7 @@
 # 🤖 WebAssist-Template
 
+![WebAssist Repository Card](./public/repoCard.png)
+
 **The ultimate Q&A Chatbot Template for Next.js applications.**
 
 > [!TIP]
