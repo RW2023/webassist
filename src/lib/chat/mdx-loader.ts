@@ -52,7 +52,7 @@ export function getFAQContent(): FAQItem[] {
 }
 
 // 2. Simple Keyword / Fuzzy Matcher
-export function findRelevantcontent(query: string, faqs: FAQItem[]): string {
+export function findRelevantContent(query: string, faqs: FAQItem[]): string {
   const lowerQuery = query.toLowerCase();
   
   // Scored matching

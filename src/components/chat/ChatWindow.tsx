@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import type { Message } from './useChat';
 import { IntakeForm } from './IntakeForm';
+import { CHATBOT_CONFIG } from '@/config/chatbot';
 
 interface ChatWindowProps {
     messages: Message[];
@@ -35,7 +36,7 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
 
     const handleIntakeSuccess = () => {
         setShowIntake(false);
-        onSendMessage("I've sent your message to support. We'll be in touch soon!");
+        onSendMessage(CHATBOT_CONFIG.intake.successMessage);
     };
 
     if (showIntake) {
@@ -67,12 +68,12 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
                         <Bot size={18} />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-sm">Assistant</h3>
+                        <h3 className="font-semibold text-sm">{CHATBOT_CONFIG.name}</h3>
                         <button
                             onClick={() => setShowIntake(true)}
                             className="text-xs text-blue-600 hover:underline"
                         >
-                            Contact Support
+                            {CHATBOT_CONFIG.fallbackButtonText}
                         </button>
                     </div>
                 </div>
@@ -94,7 +95,7 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
                     <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500">
                         <HelpCircle className="mb-2 h-10 w-10 text-gray-300" />
                         <p className="text-sm">No messages yet.</p>
-                        <p className="text-xs">Type a question to get started!</p>
+                        <p className="text-xs">{CHATBOT_CONFIG.welcomeMessage}</p>
                     </div>
                 )}
 
@@ -120,7 +121,7 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
                                     onClick={() => setShowIntake(true)}
                                     className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
                                 >
-                                    Contact Support
+                                    {CHATBOT_CONFIG.fallbackButtonText}
                                 </button>
                             )}
                         </div>
@@ -145,7 +146,7 @@ export function ChatWindow({ messages, isLoading, onSendMessage, onClose }: Chat
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type your question..."
+                        placeholder={CHATBOT_CONFIG.inputPlaceholder} // Use config placeholder
                         className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                         disabled={isLoading}
                     />

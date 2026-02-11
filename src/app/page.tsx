@@ -40,7 +40,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
-              WebAssist is a lightweight, FAQ-first chatbot for Next.js. It grounds answers in your MDX content, falls back to an intake form when unsure, and respects your design system.
+              This is a <strong>Next.js Chatbot Template</strong> designed to help developers quickly integrate AI assistance into their applications. It grounds answers in your MDX content and provides a seamless fallback to a developer contact form.
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">

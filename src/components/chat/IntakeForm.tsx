@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Send, ArrowLeft, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { CHATBOT_CONFIG } from '@/config/chatbot';
 
 interface IntakeFormProps {
   onCancel: () => void;
@@ -53,8 +54,9 @@ export function IntakeForm({ onCancel, onSubmitSuccess }: IntakeFormProps) {
         >
           <ArrowLeft size={20} />
         </button>
-        <h3 className="font-semibold">Contact Support</h3>
+        <h3 className="font-semibold">{CHATBOT_CONFIG.intake.title}</h3>
       </div>
+      <p className="mb-4 text-xs text-gray-500">{CHATBOT_CONFIG.intake.subtitle}</p>
 
       <form onSubmit={handleSubmit} className="flex flex-1 flex-col gap-4">
         <div>
